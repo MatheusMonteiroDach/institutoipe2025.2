@@ -37,3 +37,11 @@ CREATE TABLE resultado_disc (
 
 ALTER TABLE respostas_disc
 ADD COLUMN letra_original CHAR(1) AFTER pergunta_numero;
+
+ALTER TABLE respostas_disc ADD COLUMN session_id VARCHAR(100);
+ALTER TABLE resultado_disc ADD COLUMN session_id VARCHAR(255);
+
+
+
+ALTER TABLE respostas_disc MODIFY usuario_id INT NULL;
+ALTER TABLE resultado_disc MODIFY usuario_id INT NULL;
