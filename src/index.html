@@ -2,151 +2,92 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Cadastro, Login e Teste DISC</title>
+  <title>Login e Cadastro</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      padding: 30px;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    h2 {
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #865701;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #b28601;
+    }
+    #msg-cadastro, #login-msg {
+      color: red;
+      margin-top: 10px;
+    }
+    .toggle-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .toggle-link a {
+      color: #865701;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-<!-- Cadastro -->
-<div id="cadastro-section">
-  <h2>Cadastro</h2>
-  <form id="cadastro-form">
-    <input type="text" id="nome" placeholder="Nome" required /><br/>
-    <input type="email" id="email-cad" placeholder="Email" required /><br/>
-    <input type="text" id="regiao" placeholder="Região" required /><br/>
-    <input type="text" id="profissao" placeholder="Profissão" required /><br/>
-    <input type="password" id="senha-cad" placeholder="Senha" required /><br/>
-    <button type="submit">Cadastrar</button>
-  </form>
-  <div id="msg-cadastro" style="color: red;"></div>
-  <p>Já tem conta? <a href="#" id="link-login">Faça login aqui</a></p>
-</div>
+<div class="container">
+  <!-- Cadastro -->
+  <div id="cadastro-section">
+    <h2>Cadastro</h2>
+    <form id="cadastro-form">
+      <input type="text" id="nome" placeholder="Nome" required />
+      <input type="email" id="email-cad" placeholder="Email" required />
+      <input type="text" id="regiao" placeholder="Região" required />
+      <input type="text" id="profissao" placeholder="Profissão" required />
+      <input type="password" id="senha-cad" placeholder="Senha" required />
+      <button type="submit">Cadastrar</button>
+    </form>
+    <div id="msg-cadastro"></div>
+    <div class="toggle-link">Já tem conta? <a href="#" id="link-login">Faça login aqui</a></div>
+  </div>
 
-<!-- Login -->
-<div id="login-section" style="display:none;">
-  <h2>Login</h2>
-  <form id="login-form">
-    <input type="email" id="email" placeholder="Email" required /><br/>
-    <input type="password" id="senha" placeholder="Senha" required /><br/>
-    <button type="submit">Entrar</button>
-  </form>
-  <div id="login-msg" style="color: red;"></div>
-  <p>Não tem conta? <a href="#" id="link-cadastro">Cadastre-se aqui</a></p>
-</div>
-
-<!-- Teste DISC -->
-<div id="disc-section" style="display:none;">
-  <h2>Teste DISC Comportamental</h2>
-  <form id="disc-form">
-    <div id="perguntas-container"></div>
-    <button type="submit">Enviar Respostas</button>
-  </form>
-  <div id="resultado"></div>
-  <button id="logout-btn">Sair</button>
+  <!-- Login -->
+  <div id="login-section" style="display:none;">
+    <h2>Login</h2>
+    <form id="login-form">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="senha" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="login-msg"></div>
+    <div class="toggle-link">Não tem conta? <a href="#" id="link-cadastro">Cadastre-se aqui</a></div>
+  </div>
 </div>
 
 <script>
-  const perguntas = [
-    "Gosto de liderar e tomar decisões.",
-    "Sou comunicativo e gosto de estar com pessoas.",
-    "Prefiro ambientes estáveis e previsíveis.",
-    "Sou detalhista e gosto de seguir regras.",
-    "Tomo iniciativa em situações difíceis.",
-    "Gosto de motivar e influenciar os outros.",
-    "Evito conflitos e sou paciente.",
-    "Reviso cuidadosamente antes de finalizar algo.",
-    "Busco resultados e eficiência.",
-    "Sou otimista e gosto de novidades."
-  ];
-
-  const container = document.getElementById('perguntas-container');
-  const opcoesPorPergunta = [
-    // 1. Gosto de liderar e tomar decisões.
-    [
-      "Tomo a frente e decido rapidamente",      // D
-      "Gosto de inspirar e motivar os outros",   // I
-      "Prefiro colaborar e manter a harmonia",   // S
-      "Analiso as opções antes de agir"          // C
-    ],
-    // 2. Sou comunicativo e gosto de estar com pessoas.
-    [
-      "Gosto de comandar e assumir responsabilidades", // D
-      "Falo bastante e me conecto com todos",          // I
-      "Sou reservado, mas gentil com os outros",       // S
-      "Prefiro escutar e refletir antes de interagir"  // C
-    ],
-    // 3. Prefiro ambientes estáveis e previsíveis.
-    [
-      "Ambientes dinâmicos me motivam",         // D
-      "Adoro mudanças e novidades",             // I
-      "Ambientes tranquilos me deixam confortável", // S
-      "Gosto de organização e previsibilidade"  // C
-    ],
-    // 4. Sou detalhista e gosto de seguir regras.
-    [
-      "Faço o que for necessário para alcançar resultados", // D
-      "Improviso se necessário",                             // I
-      "Sigo regras quando preciso",                          // S
-      "Regras são importantes e devem ser seguidas"          // C
-    ],
-    // 5. Tomo iniciativa em situações difíceis.
-    [
-      "Encaro o desafio e ajo com firmeza",      // D
-      "Procuro manter o otimismo no grupo",      // I
-      "Aguardo o momento certo com paciência",   // S
-      "Analiso cuidadosamente antes de decidir"  // C
-    ],
-    // 6. Gosto de motivar e influenciar os outros.
-    [
-      "Motivo pelo exemplo e ação",              // D
-      "Motivo com palavras e entusiasmo",        // I
-      "Apoio silenciosamente e de forma constante", // S
-      "Dou conselhos baseados em lógica"         // C
-    ],
-    // 7. Evito conflitos e sou paciente.
-    [
-      "Enfrento os conflitos diretamente",         // D
-      "Procuro resolver com diálogo",              // I
-      "Evito ao máximo qualquer confronto",        // S
-      "Analiso friamente os dois lados antes"      // C
-    ],
-    // 8. Reviso cuidadosamente antes de finalizar algo.
-    [
-      "Finalizo rápido e corrijo depois",          // D
-      "Prefiro fazer de forma criativa",           // I
-      "Reviso com calma antes de terminar",        // S
-      "Confiro cada detalhe antes de concluir"     // C
-    ],
-    // 9. Busco resultados e eficiência.
-    [
-      "Resultados são prioridade",           // D
-      "Resultados com boa comunicação são melhores", // I
-      "Resultados equilibrados e constantes", // S
-      "Resultados com máxima precisão"        // C
-    ],
-    // 10. Sou otimista e gosto de novidades.
-    [
-      "Sou ousado e encaro o novo sem medo",   // D
-      "Sou entusiasmado com mudanças",         // I
-      "Prefiro mudanças com estabilidade",     // S
-      "Aceito mudanças se forem bem planejadas" // C
-    ]
-  ];
-
-  perguntas.forEach((texto, i) => {
-    const n = i + 1;
-    const [a, b, c, d] = opcoesPorPergunta[i];
-    container.innerHTML += `
-    <p><strong>${n}. ${texto}</strong></p>
-    <label><input type="radio" name="pergunta_${n}" value="A" required /> A) ${a}</label><br/>
-    <label><input type="radio" name="pergunta_${n}" value="B" /> B) ${b}</label><br/>
-    <label><input type="radio" name="pergunta_${n}" value="C" /> C) ${c}</label><br/>
-    <label><input type="radio" name="pergunta_${n}" value="D" /> D) ${d}</label><br/><br/>
-  `;
-  });
-
-
   const cadastroSection = document.getElementById('cadastro-section');
   const loginSection = document.getElementById('login-section');
-  const discSection = document.getElementById('disc-section');
 
   document.getElementById('link-login').addEventListener('click', e => {
     e.preventDefault();
@@ -160,6 +101,7 @@
     cadastroSection.style.display = 'block';
   });
 
+  // CADASTRO
   document.getElementById('cadastro-form').addEventListener('submit', async e => {
     e.preventDefault();
     const msg = document.getElementById('msg-cadastro');
@@ -187,12 +129,12 @@
       alert('Cadastro realizado com sucesso! Faça login.');
       cadastroSection.style.display = 'none';
       loginSection.style.display = 'block';
-
     } catch (err) {
       msg.textContent = 'Erro de conexão';
     }
   });
 
+  // LOGIN
   document.getElementById('login-form').addEventListener('submit', async e => {
     e.preventDefault();
     const msg = document.getElementById('login-msg');
@@ -214,68 +156,31 @@
         return;
       }
 
+      // salvar token e ID
       localStorage.setItem('token', data.token);
-      loginSection.style.display = 'none';
-      discSection.style.display = 'block';
+      localStorage.setItem('usuarioId', data.usuario.id);
 
+      // vincular se existir sessionId
+      const sessionId = localStorage.getItem('sessionId');
+      if (sessionId) {
+        await fetch('http://localhost:3000/api/auth/vincular', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, usuarioId: data.usuario.id })
+        });
+      }
+
+      // redirecionar
+      window.location.href = 'dash.html';
     } catch (err) {
       msg.textContent = 'Erro de conexão';
     }
   });
 
-  document.getElementById('disc-form').addEventListener('submit', async e => {
-    e.preventDefault();
-    const resultadoDiv = document.getElementById('resultado');
-    resultadoDiv.textContent = 'Enviando respostas...';
-
-    const respostas = [];
-    for(let i=1; i<=10; i++) {
-      const r = document.querySelector(`input[name="pergunta_${i}"]:checked`);
-      if(r) respostas.push({ pergunta_numero: i, resposta: r.value });
-    }
-
-    const token = localStorage.getItem('token');
-    if(!token){
-      resultadoDiv.textContent = 'Você precisa estar logado.';
-      return;
-    }
-
-    try {
-      const res = await fetch('http://localhost:3000/api/respostas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({ respostas })
-      });
-
-      const data = await res.json();
-
-      if(res.ok){
-        resultadoDiv.innerHTML = `<h3>Perfil dominante: ${data.resultado.perfil}</h3>
-          <pre>${JSON.stringify(data.resultado.pontuacoes, null, 2)}</pre>`;
-      } else {
-        resultadoDiv.textContent = data.error || 'Erro ao enviar respostas';
-      }
-    } catch(err){
-      resultadoDiv.textContent = 'Erro de conexão';
-    }
-  });
-
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    discSection.style.display = 'none';
-    loginSection.style.display = 'block';
-    document.getElementById('login-msg').textContent = '';
-    document.getElementById('resultado').textContent = '';
-  });
-
+  // limpar token antigo ao abrir
   window.onload = () => {
-    localStorage.removeItem('token');  // remove token antigo
-    cadastroSection.style.display = 'none';
-    discSection.style.display = 'none';
-    loginSection.style.display = 'block';
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuarioId');
   };
 </script>
 </body>

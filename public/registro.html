@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Login e Cadastro</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f4f4f4;
+            padding: 30px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+        h2 {
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #6B8E23;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #6B8E23;
+        }
+        #msg-cadastro, #login-msg {
+            color: red;
+            margin-top: 10px;
+        }
+        .toggle-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .toggle-link a {
+            color: #6B8E23;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Cadastro -->
+    <div id="cadastro-section">
+        <h2>Cadastro</h2>
+        <form id="cadastro-form">
+            <input type="text" id="nome" placeholder="Nome" required />
+            <input type="email" id="email-cad" placeholder="Email" required />
+            <input type="text" id="regiao" placeholder="Região" required />
+            <input type="text" id="profissao" placeholder="Profissão" required />
+            <input type="password" id="senha-cad" placeholder="Senha" required />
+            <button type="submit">Cadastrar</button>
+        </form>
+        <div id="msg-cadastro"></div>
+        <div class="toggle-link">Já tem conta? <a href="#" id="link-login">Faça login aqui</a></div>
+    </div>
+
+    <!-- Login -->
+    <div id="login-section" style="display:none;">
+        <h2>Login</h2>
+        <form id="login-form">
+            <input type="email" id="email" placeholder="Email" required />
+            <input type="password" id="senha" placeholder="Senha" required />
+            <button type="submit">Entrar</button>
+        </form>
+        <div id="login-msg"></div>
+        <div class="toggle-link">Não tem conta? <a href="#" id="link-cadastro">Cadastre-se aqui</a></div>
+    </div>
+</div>
+
+<script>
+    const cadastroSection = document.getElementById('cadastro-section');
+    const loginSection = document.getElementById('login-section');
+
+    document.getElementById('link-login').addEventListener('click', e => {
+        e.preventDefault();
+        cadastroSection.style.display = 'none';
+        loginSection.style.display = 'block';
+    });
+
+    document.getElementById('link-cadastro').addEventListener('click', e => {
+        e.preventDefault();
+        loginSection.style.display = 'none';
+        cadastroSection.style.display = 'block';
+    });
+
+    // CADASTRO
+    document.getElementById('cadastro-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        const msg = document.getElementById('msg-cadastro');
+        msg.textContent = '';
+
+        const nome = document.getElementById('nome').value;
+        const email = document.getElementById('email-cad').value;
+        const regiao = document.getElementById('regiao').value;
+        const profissao = document.getElementById('profissao').value;
+        const senha = document.getElementById('senha-cad').value;
+
+        try {
+            const res = await fetch('http://localhost:3000/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, email, regiao, profissao, senha })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                msg.textContent = data.error || 'Erro no cadastro';
+                return;
+            }
+
+            alert('Cadastro realizado com sucesso! Faça login.');
+            cadastroSection.style.display = 'none';
+            loginSection.style.display = 'block';
+        } catch (err) {
+            msg.textContent = 'Erro de conexão';
+        }
+    });
+
+    // LOGIN
+    document.getElementById('login-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        const msg = document.getElementById('login-msg');
+        msg.textContent = '';
+
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+
+        try {
+            const res = await fetch('http://localhost:3000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                msg.textContent = data.error || 'Erro no login';
+                return;
+            }
+
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('usuarioId', data.usuario.id);
+
+            const sessionId = localStorage.getItem('sessionId');
+            console.log('Chamando /api/vincular com:', sessionId, data.usuario.id);
+
+            if (sessionId) {
+                const vincularRes = await fetch('http://localhost:3000/api/vincular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId,
+                        usuarioId: Number(data.usuario.id) // Garante que seja número
+                    })
+                });
+                const vincularData = await vincularRes.json();
+                console.log('Vinculação:', vincularData);
+
+                if (vincularRes.ok) {
+                    localStorage.removeItem('sessionId');
+                }
+            }
+
+            window.location.href = 'dash.html';
+        } catch (err) {
+            msg.textContent = 'Erro de conexão';
+            console.error(err);
+        }
+    });
+
+    window.onload = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuarioId');
+        // sessionId deve ser mantido
+    };
+</script>
+</body>
+</html>

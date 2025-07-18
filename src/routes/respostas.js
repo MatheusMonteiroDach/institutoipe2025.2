@@ -4,59 +4,47 @@ const db = require('../config/db');
 const verificarToken = require('../middlewares/authMiddleware');
 
 // salvar respostas DISC
-router.post('/', verificarToken, (req, res) => {
-    const usuario_id = req.usuario.id;
-    const { respostas } = req.body;
+router.post('/', (req, res) => {
+    const { respostas, sessionId } = req.body;
+    const usuario_id = req.usuario?.id || null;// Envio anônimo por enquanto
 
-    // validações básicas
-    if (!usuario_id || !Array.isArray(respostas) || respostas.length !== 10) {
-        return res.status(400).json({ error: 'Envie exatamente 10 respostas.' });
+    if (!Array.isArray(respostas) || !sessionId) {
+        return res.status(400).json({ error: 'Respostas e sessionId são obrigatórios.' });
     }
 
-    const perguntasValidas = [1,2,3,4,5,6,7,8,9,10];
+    // Validação das perguntas
+    const perguntasValidas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     const numerosEnviados = respostas.map(r => r.pergunta_numero);
     const todasValidas = numerosEnviados.every(num => perguntasValidas.includes(num));
     if (!todasValidas) {
         return res.status(400).json({ error: 'Respostas contêm perguntas inválidas.' });
     }
 
-    const letrasValidas = ['A', 'B', 'C', 'D'];
-    const mapaDISC = { A: 'D', B: 'I', C: 'S', D: 'C' };
-
-    const respostasValidas = respostas.every(r => letrasValidas.includes(r.resposta.toUpperCase()));
+    // Validação das letras DISC
+    const letrasValidas = ['D', 'I', 'S', 'C'];
+    const respostasValidas = respostas.every(r =>
+        letrasValidas.includes(r.resposta.toUpperCase())
+    );
     if (!respostasValidas) {
-        return res.status(400).json({ error: 'Respostas devem ser apenas A, B, C ou D.' });
+        return res.status(400).json({ error: 'Respostas devem conter apenas D, I, S ou C.' });
     }
 
-    // contar pontuação DISC
+    // Contar pontuação DISC e preparar dados para inserção
     const contagem = { D: 0, I: 0, S: 0, C: 0 };
-    const values = [];
-
-    respostas.forEach(r => {
-        const letraRaw = r.resposta.toUpperCase();
-        const letraDISC = mapaDISC[letraRaw];
-
+    const values = respostas.map(r => {
+        const letraDISC = r.resposta.toUpperCase();
         contagem[letraDISC]++;
-        values.push([
-            usuario_id,
-            r.pergunta_numero,
-            letraDISC  // armazenamos a letra DISC já convertida
-        ]);
+        return [usuario_id, r.pergunta_numero, letraDISC, letraDISC, sessionId];
     });
 
-    const queryInsert = 'INSERT INTO respostas_disc (usuario_id, pergunta_numero, resposta) VALUES ?';
+    // Inserir respostas no banco
+    const query = `INSERT INTO respostas_disc 
+      (usuario_id, pergunta_numero, resposta, letra_original, session_id)
+      VALUES ?`;
 
-    db.query(queryInsert, [values], (err, result) => {
+    db.query(query, [values], (err, result) => {
         if (err) {
             console.error('Erro ao salvar respostas:', err);
-
-            if (err.code === 'ER_DUP_ENTRY') {
-                return res.status(409).json({
-                    error: 'Uma ou mais respostas já foram registradas para esse usuário.',
-                    detalhe: 'Não é permitido responder a mesma pergunta duas vezes.'
-                });
-            }
-
             return res.status(500).json({ error: 'Erro ao salvar respostas no banco' });
         }
 
@@ -67,19 +55,21 @@ router.post('/', verificarToken, (req, res) => {
             .map(([k]) => k)
             .join('/');
 
+        // Inserir resultado DISC no banco
         const queryResultado = `
-            INSERT INTO resultado_disc 
-            (usuario_id, pontuacao_d, pontuacao_i, pontuacao_s, pontuacao_c, perfil)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO resultado_disc
+            (usuario_id, pontuacao_d, pontuacao_i, pontuacao_s, pontuacao_c, perfil, session_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
 
         db.query(queryResultado, [
-            usuario_id,
+            usuario_id,           // null no início
             contagem.D,
             contagem.I,
             contagem.S,
             contagem.C,
-            perfilDominante
+            perfilDominante,
+            sessionId
         ], (err2) => {
             if (err2) {
                 console.error('Erro ao salvar resultado:', err2);

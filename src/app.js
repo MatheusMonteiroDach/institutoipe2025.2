@@ -7,6 +7,8 @@ const usuariosRoutes = require('./routes/usuarios');
 const respostasRoutes = require('./routes/respostas');
 const resultadoRoutes = require('./routes/resultado');
 const authRoutes = require('./routes/auth');
+const vincularRoute = require('./routes/vincular');
+
 
 const app = express();
 
@@ -18,6 +20,8 @@ app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/respostas', respostasRoutes);
 app.use('/api/resultado', resultadoRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/vincular', vincularRoute);
+
 
 // Rota de teste
 app.get('/', (req, res) => {

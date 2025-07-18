@@ -8,7 +8,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
@@ -16,5 +15,14 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KaikeRosa/testedisc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KaikeRosa/testedisc/issues"
+  },
+  "homepage": "https://github.com/KaikeRosa/testedisc#readme",
+  "description": ""
 }
