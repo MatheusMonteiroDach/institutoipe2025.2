@@ -2,10 +2,10 @@
   "name": "institutoipe2025",
   "version": "1.0.0",
   "description": "Backend Node.js da Plataforma DISC com frontend HTML estático",
-  "main": "app.js",
+  "main": "src/app.js",
   "type": "module",
   "scripts": {
-    "start": "node app.js",
+    "start": "node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
