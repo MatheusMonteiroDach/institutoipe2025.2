@@ -1,13 +1,13 @@
 {
-  "name": "disc",
+  "name": "institutoipe2025",
   "version": "1.0.0",
+  "description": "Backend Node.js da Plataforma DISC com frontend HTML estático",
   "main": "index.js",
+  "type": "module",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
@@ -18,11 +18,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KaikeRosa/testedisc.git"
+    "url": "https://github.com/MatheusMonteiroDach/institutoipe2025.2"
   },
-  "bugs": {
-    "url": "https://github.com/KaikeRosa/testedisc/issues"
-  },
-  "homepage": "https://github.com/KaikeRosa/testedisc#readme",
-  "description": ""
+  "author": "",
+  "license": "ISC"
 }
