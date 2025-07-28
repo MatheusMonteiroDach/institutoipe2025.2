@@ -1,9 +1,7 @@
 {
-  "name": "institutoipe2025",
+  "name": "disc",
   "version": "1.0.0",
-  "description": "Backend Node.js da Plataforma DISC com frontend HTML estático",
   "main": "src/app.js",
-  "type": "module",
   "scripts": {
     "start": "node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,11 +13,5 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/MatheusMonteiroDach/institutoipe2025.2"
-  },
-  "author": "",
-  "license": "ISC"
+  }
 }
