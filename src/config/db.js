@@ -1,5 +1,8 @@
 const mysql = require('mysql2');
-require('dotenv').config();
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 const db = mysql.createConnection({
     host: process.env.MYSQLHOST,
@@ -9,10 +12,9 @@ const db = mysql.createConnection({
     port: process.env.MYSQLPORT || 3306
 });
 
-
 db.connect((err) => {
     if (err) {
-        console.error('Erro ao conectar no bando de dados:', err);
+        console.error('Erro ao conectar no banco de dados:', err);
     } else {
         console.log('Conectado ao banco de dados!');
     }
