@@ -15,17 +15,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ROTAS prefixadas com /api
+// Rotas da API prefixadas com /api
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/respostas', respostasRoutes);
 app.use('/api/resultado', resultadoRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/vincular', vincularRoute);
 
-// Servir arquivos estáticos da pasta "public"
+// Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.get('*', (req, res) => {
+// Serve index.html para qualquer rota que não comece com /api
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
