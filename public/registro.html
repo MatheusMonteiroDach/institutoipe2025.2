@@ -114,7 +114,7 @@
         const senha = document.getElementById('senha-cad').value;
 
         try {
-            const res = await fetch('http://localhost:3000/api/auth/register', {
+            const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nome, email, regiao, profissao, senha })
@@ -144,7 +144,7 @@
         const senha = document.getElementById('senha').value;
 
         try {
-            const res = await fetch('http://localhost:3000/api/auth/login', {
+            const res = await fetch('/api/auth/login' {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, senha })
@@ -163,7 +163,7 @@
             console.log('Chamando /api/vincular com:', sessionId, data.usuario.id);
 
             if (sessionId) {
-                const vincularRes = await fetch('http://localhost:3000/api/vincular', {
+                const vincularRes = await fetch('/api/vincular', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
