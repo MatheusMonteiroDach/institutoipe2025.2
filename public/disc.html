@@ -237,7 +237,7 @@
       }
 
       try {
-        const response = await fetch('http://localhost:3000/api/respostas', {
+        const response = await fetch('/api/respostas', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ respostas, sessionId })
