@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste DISC - Análise Comportamental</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        :root {
+            --primary: #556B2F;
+            /* Verde oliva */
+            --primary-light: #6B8E23;
+            --secondary: #F5F5F5;
+            /* Branco */
+            --accent: #8FBC8F;
+            --text: #333;
+            --text-light: #777;
+            --radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* <<< ADIÇÃO: classe usada no HTML/JS e que não existia >>> */
+        .hidden { display: none !important; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(85, 107, 47, 0.9), rgba(85, 107, 47, 0.8)), url('https://images.unsplash.com/photo-1521791055366-0d553872125f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: var(--radius);
+            text-align: center;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: white;
+            color: var(--primary);
+            padding: 0.8rem 1.8rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            background-color: white;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feature h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Páginas específicas */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* Página de teste */
+        .question-container { margin-bottom: 2rem; }
+        .question {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .option {
+            padding: 1.2rem;
+            border-radius: var(--radius);
+            background-color: var(--secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .option:hover { background-color: #e8e8e8; }
+        .option.selected {
+            background-color: var(--primary-light);
+            color: white;
+            border-color: var(--primary);
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        /* Página de login */
+        .auth-form { max-width: 500px; margin: 0 auto; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: var(--radius);
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+        .form-footer { text-align: center; margin-top: 1.5rem; }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .chart-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        .animal-profile {
+            text-align: center;
+            padding: 2rem;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        .animal-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid var(--primary);
+            margin: 1rem auto;
+        }
+        .animal-name {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .animal-description { max-width: 600px; margin: 0 auto; }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .options { grid-template-columns: 1fr; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            nav ul { gap: 0.5rem; }
+        }
+
+        @media (max-width: 992px) {
+            .header-container { flex-direction: column; padding: 1rem; }
+            nav ul { margin-top: 1rem; flex-wrap: wrap; justify-content: center; }
+            .hero h1 { font-size: 2rem; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .animal-image { width: 150px; height: 150px; }
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .options { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; gap: 1rem; }
+            .navigation button { width: 100%; }
+            .hero { padding: 2rem 1rem; }
+            .card { padding: 1.5rem; }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 { font-size: 1.8rem; }
+            .hero p { font-size: 1rem; }
+            nav a { padding: 0.5rem; font-size: 0.9rem; }
+            .auth-form { padding: 1rem; }
+            .animal-profile { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+            </svg>
+            <span>DISC</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="event.preventDefault(); showPage('home')">Home</a></li>
+                <li><a href="#" onclick="event.preventDefault(); showPage('test')">Teste</a></li>
+                <li><a href="#" onclick="event.preventDefault(); showPage('login')">Login</a></li>
+                <li><a href="#" onclick="event.preventDefault(); showPage('dashboard')">Dashboard</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Página Home -->
+    <div id="home-page" class="page active">
+        <section class="hero">
+            <h1>Descubra seu perfil comportamental com o teste DISC</h1>
+            <p>Conheça seus pontos fortes, áreas de desenvolvimento e como se relacionar melhor com pessoas de diferentes perfis.</p>
+            <a href="#" onclick="event.preventDefault(); showPage('test')" class="btn btn-primary">Fazer o teste agora</a>
+        </section>
+
+        <div class="card">
+            <h2>O que é o teste DISC?</h2>
+            <p>O teste DISC é uma ferramenta de avaliação comportamental que identifica quatro dimensões principais do comportamento humano:</p>
+
+            <div class="grid">
+                <div class="feature">
+                    <div class="feature-icon">D</div>
+                    <h3>Dominância</h3>
+                    <p>Como você lida com desafios e problemas. Pessoas com alta dominância são diretas, assertivas e focadas em resultados.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">I</div>
+                    <h3>Influência</h3>
+                    <p>Como você interage com os outros e influencia pessoas. Perfis com alta influência são comunicativos, entusiasmados e sociáveis.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">S</div>
+                    <h3>Estabilidade</h3>
+                    <p>Como você lida com mudanças e ritmo. Indivíduos com alta estabilidade são pacientes, consistentes e valorizam harmonia.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">C</div>
+                    <h3>Conformidade</h3>
+                    <p>Como você lida com regras e detalhes. Pessoas com alta conformidade são analíticas, precisas e focadas em qualidade.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Para que serve o teste DISC?</h2>
+            <p>O teste DISC é amplamente utilizado em diversos contextos:</p>
+            <ul style="margin: 1rem 0 1rem 2rem;">
+                <li><strong>Desenvolvimento Pessoal:</strong> Autoconhecimento e melhoria de habilidades interpessoais</li>
+                <li><strong>Recrutamento e Seleção:</strong> Identificação de perfis adequados para diferentes funções</li>
+                <li><strong>Gestão de Equipes:</strong> Melhor compreensão e aproveitamento das potencialidades da equipe</li>
+                <li><strong>Vendas e Atendimento:</strong> Adaptação ao estilo do cliente para comunicação mais eficaz</li>
+                <li><strong>Educação:</strong> Identificação de estilos de aprendizagem e melhoria da relação professor-aluno</li>
+            </ul>
+            <p>Nosso teste foi desenvolvido por especialistas em comportamento humano e possui 30 questões cuidadosamente elaboradas para mapear seu perfil com precisão.</p>
+        </div>
+
+        <div class="card">
+            <h2>Como funciona?</h2>
+            <div style="display: flex; align-items: center; gap: 2rem; margin-top: 1.5rem;">
+                <div style="flex: 1;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">Passo a passo:</h3>
+                    <ol style="margin-left: 1.5rem;">
+                        <li style="margin-bottom: 0.5rem;">Responda as 30 questões com sinceridade</li>
+                        <li style="margin-bottom: 0.5rem;">Selecione a alternativa que mais se parece com você</li>
+                        <li style="margin-bottom: 0.5rem;">Receba seu perfil completo com gráficos</li>
+                        <li>Descubra qual animal representa seu estilo</li>
+                    </ol>
+                </div>
+                <div style="flex: 1; text-align: center;">
+                    <img src="https://images.unsplash.com/photo-1581093450021-4a7360e9a6d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Teste DISC" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow);">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Página de Teste -->
+    <div id="test-page" class="page">
+        <div class="card">
+            <h2>Teste DISC - 30 Perguntas</h2>
+            <p>Para cada afirmação, selecione a alternativa que melhor descreve seu comportamento na maioria das situações.</p>
+
+            <div class="question-container" id="questions-container">
+                <!-- As perguntas serão inseridas aqui pelo JavaScript -->
+            </div>
+
+            <div class="navigation">
+                <button id="prev-btn" class="btn" onclick="prevQuestion()">← Anterior</button>
+                <button id="next-btn" class="btn btn-primary" onclick="nextQuestion()">Próxima →</button>
+                <button id="submit-btn" class="btn btn-primary hidden" onclick="submitTest()">Enviar Respostas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Página de Login/Cadastro -->
+    <div id="login-page" class="page">
+        <div class="card auth-form">
+            <div id="login-form">
+                <h2>Login</h2>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="login()">Entrar</button>
+                <div class="form-footer">
+                    <p>Não tem uma conta? <a href="#" onclick="event.preventDefault(); showRegisterForm()">Cadastre-se</a></p>
+                </div>
+            </div>
+
+            <div id="register-form" class="hidden">
+                <h2>Cadastro</h2>
+                <div class="form-group">
+                    <label for="reg-name">Nome completo</label>
+                    <input type="text" id="reg-name">
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Senha (mínimo 8 caracteres)</label>
+                    <input type="password" id="reg-password" minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="reg-confirm">Confirme sua senha</label>
+                    <input type="password" id="reg-confirm">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="register()">Cadastrar</button>
+                <div class="form-footer">
+                    <p>Já tem uma conta? <a href="#" onclick="event.preventDefault(); showLoginForm()">Faça login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Página de Dashboard -->
+    <div id="dashboard-page" class="page">
+        <div class="card">
+            <h2>Seu Perfil Comportamental</h2>
+
+            <div class="animal-profile" id="animal-result">
+                <!-- Resultado será inserido aqui -->
+            </div>
+
+            <h3 style="color: var(--primary); margin-bottom: 1rem;">Análise de Resultados</h3>
+            <div class="dashboard-grid">
+                <div class="chart-container">
+                    <canvas id="chart1"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart2"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart3"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart4"></canvas>
+                </div>
+            </div>
+
+            <h3 style="color: var(--primary); margin-top: 2rem;">Métricas do Site</h3>
+            <div class="dashboard-grid">
+                <div class="chart-container">
+                    <canvas id="chart5"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart6"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>Teste DISC &copy; 2023 - Todos os direitos reservados</p>
+    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Ferramenta de análise comportamental para desenvolvimento pessoal e profissional</p>
+</footer>
+
+<script>
+    // Dados do teste - 30 perguntas
+    const questions = [/* (mesmo conteúdo das 30 perguntas do seu arquivo) */
+        {
+            id: 1, text: "Quando surge um problema no trabalho, você geralmente:",
+            options: [{text:"Assume o controle e busca resolver imediatamente",value:"D"},
+                {text:"Conversa com colegas para encontrar soluções juntos",value:"I"},
+                {text:"Aguarda para entender melhor a situação antes de agir",value:"S"},
+                {text:"Analisa todos os aspectos cuidadosamente",value:"C"}]
+        }, {
+            id: 2, text: "Em reuniões, seu comportamento é mais:",
+            options: [{text:"Direto ao ponto, focado em decisões",value:"D"},
+                {text:"Animado, gosta de contar histórias",value:"I"},
+                {text:"Paciente, ouve mais do que fala",value:"S"},
+                {text:"Analítico, baseado em dados",value:"C"}]
+        }, {
+            id: 3, text: "Você prefere ambientes de trabalho que são:",
+            options: [{text:"Desafiadores e dinâmicos",value:"D"},
+                {text:"Sociais e colaborativos",value:"I"},
+                {text:"Estáveis e previsíveis",value:"S"},
+                {text:"Organizados e estruturados",value:"C"}]
+        }, {
+            id: 4, text: "Quando precisa convencer alguém, você:",
+            options: [{text:"Apresenta fatos concretos e resultados",value:"D"},
+                {text:"Cria entusiasmo e mostra benefícios",value:"I"},
+                {text:"Escuta primeiro para entender a outra pessoa",value:"S"},
+                {text:"Prepara argumentos lógicos e dados",value:"C"}]
+        }, {
+            id: 5, text: "Seu ritmo de trabalho é mais:",
+            options: [{text:"Rápido e intenso",value:"D"},
+                {text:"Variável, com altos e baixos",value:"I"},
+                {text:"Constante e estável",value:"S"},
+                {text:"Metódico e preciso",value:"C"}]
+        }, {
+            id: 6, text: "Ao receber feedback, você:",
+            options: [{text:"Foca no que pode melhorar para resultados",value:"D"},
+                {text:"Agradece e usa como oportunidade para conversar",value:"I"},
+                {text:"Reflete calmamente sobre os pontos mencionados",value:"S"},
+                {text:"Analisa criteriosamente cada item",value:"C"}]
+        }, {
+            id: 7, text: "Em projetos em grupo, você costuma:",
+            options: [{text:"Assumir a liderança naturalmente",value:"D"},
+                {text:"Animar o grupo e manter o clima leve",value:"I"},
+                {text:"Contribuir de forma consistente e cooperativa",value:"S"},
+                {text:"Organizar os processos e detalhes",value:"C"}]
+        }, {
+            id: 8, text: "Quando as coisas não saem como planejado:",
+            options: [{text:"Adapto-me rapidamente e busco alternativas",value:"D"},
+                {text:"Vejo o lado positivo e animo os outros",value:"I"},
+                {text:"Mantenho a calma e sigo em frente",value:"S"},
+                {text:"Reavaliar o plano com mais cuidado",value:"C"}]
+        }, {
+            id: 9, text: "Seu estilo de comunicação é mais:",
+            options: [{text:"Objetivo e direto",value:"D"},
+                {text:"Expressivo e entusiasmado",value:"I"},
+                {text:"Diplomático e ponderado",value:"S"},
+                {text:"Detalhado e preciso",value:"C"}]
+        }, {
+            id: 10, text: "O que mais te motiva no trabalho?",
+            options: [{text:"Desafios e oportunidades de liderança",value:"D"},
+                {text:"Reconhecimento e interação com pessoas",value:"I"},
+                {text:"Ambiente harmonioso e estável",value:"S"},
+                {text:"Problemas complexos que exigem análise",value:"C"}]
+        }, {
+            id: 11, text: "Ao lidar com prazos:",
+            options: [{text:"Adianto-me para terminar antes",value:"D"},
+                {text:"Trabalho melhor sob pressão",value:"I"},
+                {text:"Sigo um ritmo constante",value:"S"},
+                {text:"Planejo cada etapa com antecedência",value:"C"}]
+        }, {
+            id: 12, text: "Em situações de conflito:",
+            options: [{text:"Enfrento diretamente para resolver rápido",value:"D"},
+                {text:"Busco mediar e manter boas relações",value:"I"},
+                {text:"Procuro acalmar os ânimos",value:"S"},
+                {text:"Analiso os fatos antes de agir",value:"C"}]
+        }, {
+            id: 13, text: "Sobre regras e procedimentos:",
+            options: [{text:"São úteis se não atrapalharem os resultados",value:"D"},
+                {text:"Podem ser adaptadas conforme a situação",value:"I"},
+                {text:"Devem ser seguidas para manter a ordem",value:"S"},
+                {text:"Existem por razões lógicas e devem ser rigorosamente aplicadas",value:"C"}]
+        }, {
+            id: 14, text: "Seu maior medo profissional é:",
+            options: [{text:"Ficar estagnado sem desafios",value:"D"},
+                {text:"Ser ignorado ou não reconhecido",value:"I"},
+                {text:"Mudanças bruscas e imprevisíveis",value:"S"},
+                {text:"Cometer erros por falta de informação",value:"C"}]
+        }, {
+            id: 15, text: "Ao aprender algo novo, você prefere:",
+            options: [{text:"Aprender fazendo na prática",value:"D"},
+                {text:"Discutir com outras pessoas",value:"I"},
+                {text:"Ter instruções claras e passo a passo",value:"S"},
+                {text:"Estudar a fundo antes de tentar",value:"C"}]
+        }, {
+            id: 16, text: "Quando delegar tarefas, você:",
+            options: [{text:"Define o resultado esperado e deixa a pessoa decidir como fazer",value:"D"},
+                {text:"Explica com entusiasmo e motiva a equipe",value:"I"},
+                {text:"Fornece orientações claras e apoio constante",value:"S"},
+                {text:"Especifica exatamente como a tarefa deve ser executada",value:"C"}]
+        }, {
+            id: 17, text: "Em eventos sociais no trabalho:",
+            options: [{text:"Participo se for estratégico para meus objetivos",value:"D"},
+                {text:"Sou o centro das atenções e animo o grupo",value:"I"},
+                {text:"Conversar com pessoas conhecidas em pequenos grupos",value:"S"},
+                {text:"Prefiro conversas profundas com poucas pessoas",value:"C"}]
+        }, {
+            id: 18, text: "Sobre riscos:",
+            options: [{text:"São necessários para grandes conquistas",value:"D"},
+                {text:"Tornam a vida mais emocionante",value:"I"},
+                {text:"Devem ser calculados e minimizados",value:"S"},
+                {text:"Devem ser evitados a menos que totalmente compreendidos",value:"C"}]
+        }, {
+            id: 19, text: "Quando alguém discorda de você:",
+            options: [{text:"Enfrento o debate com argumentos fortes",value:"D"},
+                {text:"Tento encontrar pontos em comum",value:"I"},
+                {text:"Ouço atentamente para entender sua perspectiva",value:"S"},
+                {text:"Apresento dados e fatos para sustentar minha posição",value:"C"}]
+        }, {
+            id: 20, text: "Sua abordagem para tomar decisões é:",
+            options: [{text:"Rápida e intuitiva",value:"D"},
+                {text:"Influenciada por como as pessoas serão impactadas",value:"I"},
+                {text:"Cautelosa e ponderada",value:"S"},
+                {text:"Baseada em análise detalhada de informações",value:"C"}]
+        }, {
+            id: 21, text: "Quando trabalha sob pressão:",
+            options: [{text:"Fico mais focado e produtivo",value:"D"},
+                {text:"Busco apoio da equipe para dividir a carga",value:"I"},
+                {text:"Mantenho a calma e sigo meu ritmo",value:"S"},
+                {text:"Verifico cada detalhe para evitar erros",value:"C"}]
+        }, {
+            id: 22, text: "Seu processo criativo é mais:",
+            options: [{text:"Prático e orientado a soluções",value:"D"},
+                {text:"Colaborativo e cheio de ideias",value:"I"},
+                {text:"Lento e gradual, com refinamento constante",value:"S"},
+                {text:"Analítico e baseado em dados",value:"C"}]
+        }, {
+            id: 23, text: "Ao receber uma nova tarefa:",
+            options: [{text:"Parto logo para a ação",value:"D"},
+                {text:"Compartilho ideias com outros antes de começar",value:"I"},
+                {text:"Organizo um plano antes de iniciar",value:"S"},
+                {text:"Pesquiso tudo sobre o assunto primeiro",value:"C"}]
+        }, {
+            id: 24, text: "Quando alguém comete um erro:",
+            options: [{text:"Aponto imediatamente para corrigir",value:"D"},
+                {text:"Dou feedback de forma encorajadora",value:"I"},
+                {text:"Espero o momento adequado para conversar",value:"S"},
+                {text:"Analiso o erro em detalhes antes de comentar",value:"C"}]
+        }, {
+            id: 25, text: "Sobre multitarefa:",
+            options: [{text:"Lido bem com várias coisas ao mesmo tempo",value:"D"},
+                {text:"Gosto da variedade, mas posso me dispersar",value:"I"},
+                {text:"Prefiro focar em uma coisa de cada vez",value:"S"},
+                {text:"Só faço multitarefa se puder manter o padrão de qualidade",value:"C"}]
+        }, {
+            id: 26, text: "Ao apresentar ideias:",
+            options: [{text:"Foco nos resultados e benefícios práticos",value:"D"},
+                {text:"Uso histórias e exemplos envolventes",value:"I"},
+                {text:"Apresento de forma clara e passo a passo",value:"S"},
+                {text:"Incluo dados e evidências de suporte",value:"C"}]
+        }, {
+            id: 27, text: "Sua mesa de trabalho tende a ser:",
+            options: [{text:"Funcional com o essencial à mão",value:"D"},
+                {text:"Um pouco desorganizada, mas criativa",value:"I"},
+                {text:"Arrumeada e com tudo em seu lugar",value:"S"},
+                {text:"Meticulosamente organizada com sistemas",value:"C"}]
+        }, {
+            id: 28, text: "Quando trabalha em equipe, você valoriza:",
+            options: [{text:"Eficiência e atingir metas",value:"D"},
+                {text:"Criatividade e bom relacionamento",value:"I"},
+                {text:"Cooperação e harmonia",value:"S"},
+                {text:"Precisão e qualidade do trabalho",value:"C"}]
+        }, {
+            id: 29, text: "Sobre mudanças na empresa:",
+            options: [{text:"Aproveito as oportunidades que trazem",value:"D"},
+                {text:"Animo os colegas a encarar positivamente",value:"I"},
+                {text:"Preciso de tempo para me adaptar",value:"S"},
+                {text:"Analiso cuidadosamente os prós e contras",value:"C"}]
+        }, {
+            id: 30, text: "Seu maior orgulho profissional é:",
+            options: [{text:"Conquistar resultados expressivos",value:"D"},
+                {text:"Ter uma rede de contatos valiosa",value:"I"},
+                {text:"Manter relações duradouras e de confiança",value:"S"},
+                {text:"Dominar completamente minha área de atuação",value:"C"}]
+        }];
+
+    // Variáveis globais
+    let currentQuestion = 0;
+    let answers = JSON.parse(localStorage.getItem('answers') || '{}');
+    let user = null;
+    let testCompleted = false;
+    let respostas = JSON.parse(localStorage.getItem('answers')) || {};
+
+    // helpers
+    function saveAnswers() {
+        sessionStorage.setItem('respostas', JSON.stringify(respostas));
+    }
+    function getToken() {
+        return localStorage.getItem('token') || '';
+    }
+
+    // Chart.js – registra o plugin se quiser datalabels
+    if (window.ChartDataLabels) {
+        Chart.register(ChartDataLabels);
+    }
+
+    // destruir gráficos anteriores p/ não duplicar
+    function destroyIfExists(canvasId) {
+        const chart = Chart.getChart(canvasId);
+        if (chart) chart.destroy();
+    }
+
+    // Dados simulados de acesso ao site (para os gráficos do dashboard)
+    const siteData = {
+        accesses: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+            data: [1200, 1900, 1700, 2100, 2300, 2450, 2200, 2500, 2650, 2800, 3000, 3200]
+        },
+        regions: {
+            labels: ['Sudeste', 'Sul', 'Nordeste', 'Centro-Oeste', 'Norte'],
+            data: [45, 25, 15, 10, 5]
+        }
+    };
+
+    // Navegação de páginas
+    function showPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`${page}-page`).classList.add('active');
+
+        if (page === 'test') {
+            renderQuestion();
+        } else if (page === 'dashboard') {
+            // só bloqueia se não tiver user OU (sem resultados E sem teste completo)
+            if (!user || (!testCompleted && !(user && user.results))) {
+                alert('Por favor, faça login e complete o teste para ver seu dashboard.');
+                showPage('login');
+            } else {
+                renderDashboard();
+            }
+        }
+    }
+
+    function showLoginForm() {
+        document.getElementById('login-form').classList.remove('hidden');
+        document.getElementById('register-form').classList.add('hidden');
+    }
+
+    function showRegisterForm() {
+        document.getElementById('login-form').classList.add('hidden');
+        document.getElementById('register-form').classList.remove('hidden');
+    }
+
+    // Lógica do teste
+    function renderQuestion() {
+        const container = document.getElementById('questions-container');
+        const question = questions[currentQuestion];
+
+        container.innerHTML = `
+        <div class="question">Pergunta ${currentQuestion + 1} de ${questions.length}</div>
+        <div class="question">${question.text}</div>
+        <div class="options">
+          ${question.options.map((option, i) => `
+            <div class="option ${answers[currentQuestion] === i ? 'selected' : ''}"
+                 onclick="selectOption(${i})">
+              ${option.text}
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+        document.querySelectorAll('.option').forEach(opt => {
+            opt.addEventListener('click', function() {
+                // remove verde das outras da mesma pergunta
+                const siblings = this.parentElement.querySelectorAll('.option');
+                siblings.forEach(sib => sib.classList.remove('selected'));
+
+                // adiciona verde na clicada
+                this.classList.add('selected');
+
+                // salva no sessionStorage ou no array answers
+                const qIndex = currentQuestion;
+                answers[qIndex] = [...this.parentElement.children].indexOf(this);
+                sessionStorage.setItem('respostas', JSON.stringify(answers));
+            });
+        });
+
+        // Atualiza navegação
+        document.getElementById('prev-btn').style.display = currentQuestion === 0 ? 'none' : 'block';
+        document.getElementById('next-btn').classList.toggle('hidden', currentQuestion === questions.length - 1);
+        document.getElementById('submit-btn').classList.toggle('hidden', currentQuestion !== questions.length - 1);
+    }
+
+    function selectOption(index) {
+        answers[currentQuestion] = index;
+        saveAnswers();              // <<< garante persistência
+        renderQuestion();
+    }
+
+    function prevQuestion() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            renderQuestion();
+        }
+    }
+
+    function nextQuestion() {
+        if (answers[currentQuestion] === undefined) {
+            alert('Por favor, selecione uma opção antes de continuar.');
+            return;
+        }
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            renderQuestion();
+        }
+    }
+
+    // >>>>>>> FUNÇÕES CORRIGIDAS (sem duplicações/simulações) <<<<<<<
+    async function submitTest() {
+        if (answers[currentQuestion] === undefined) {
+            alert('Por favor, selecione uma opção antes de enviar.');
+            return;
+        }
+        if (!localStorage.getItem('sessionId')) {
+            // Usa UUID do navegador para vincular depois ao usuário
+            if (crypto && crypto.randomUUID) {
+                localStorage.setItem('sessionId', crypto.randomUUID());
+            } else {
+                localStorage.setItem('sessionId', 'sess-' + Date.now());
+            }
+        }
+        const sessionId = localStorage.getItem('sessionId');
+        const respostas = [];
+        for (let i = 0; i < questions.length; i++) {
+            const answerIndex = answers[i];
+            if (answerIndex === undefined) {
+                alert(`Você precisa responder a pergunta ${i + 1}.`);
+                return;
+            }
+            respostas.push({
+                pergunta_numero: i + 1,
+                resposta: questions[i].options[answerIndex].value
+            });
+        }
+        results = {D: 0, I: 0, S: 0, C: 0};
+        respostas.forEach(r => {
+            if (results.hasOwnProperty(r.resposta)) {
+                results[r.resposta]++;
+            }
+        });
+        user = {...user, results, lastTest: new Date().toLocaleDateString()};
+        testCompleted = true;
+
+        // Se quiser ainda tentar enviar ao backend (opcional)
+        try {
+            await fetch('http://localhost:3000/api/respostas', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({respostas, sessionId})
+            });
+        } catch (err) {
+            console.warn('Servidor indisponível, resultados salvos apenas localmente.');
+        }
+
+        showPage('login');
+    }
+
+    async function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        if (!email || !password) {
+            alert('Preencha todos os campos.');
+            return;
+        }
+        try {
+            const res = await fetch('http://localhost:3000/api/auth/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, senha: password})
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Erro no login');
+
+            // Salva o ID do usuário para uso posterior
+            localStorage.setItem('usuarioId', data.usuario.id);
+
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('usuarioId', data.usuario.id);
+            user = {...user, name: data.usuario.nome, email: data.usuario.email};
+
+            // Se houver respostas no localStorage, envia para o backend
+            const storedAnswers = localStorage.getItem('answers');
+            if (storedAnswers) {
+                const sessionId = localStorage.getItem('sessionId') || Date.now().toString();
+                await fetch('http://localhost:3000/api/respostas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${data.token}`
+                    },
+                    body: JSON.stringify({
+                        usuario_id: data.usuario.id,
+                        respostas: Object.keys(JSON.parse(storedAnswers)).map(key => ({
+                            pergunta_numero: parseInt(key) + 1,
+                            resposta: questions[key].options[JSON.parse(storedAnswers)[key]].value
+                        })),
+                        sessionId
+                    })
+                })
+
+                await fetch('http://localhost:3000/api/vincular', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${data.token}`
+                    },
+                    body: JSON.stringify({
+                        sessionId: sessionId,
+                        usuarioId: data.usuario.id
+                    })
+                });
+
+                localStorage.removeItem('answers');
+                localStorage.removeItem('sessionId');
+            }
+
+
+            alert('Login realizado com sucesso!');
+            showPage('dashboard');
+        } catch (err) {
+            alert(`Erro: ${err.message}`);
+        }
+    }
+
+
+    async function register() {
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const confirm = document.getElementById('reg-confirm').value;
+
+        if (!name || !email || !password || !confirm) {
+            alert('Preencha todos os campos.');
+            return;
+        }
+        if (password !== confirm) {
+            alert('As senhas não coincidem!');
+            return;
+        }
+        if (password.length < 8) {
+            alert('A senha deve ter pelo menos 8 caracteres.');
+            return;
+        }
+
+        try {
+            const res = await fetch('http://localhost:3000/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome: name, email, senha: password })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Erro no cadastro');
+            alert('Cadastro realizado com sucesso! Faça login.');
+            showLoginForm();
+        } catch (err) {
+            alert(`Erro: ${err.message}`);
+        }
+    }
+    // >>>>>>> FIM FUNÇÕES CORRIGIDAS <<<<<<<
+
+    function renderDashboard() {
+        let results = null;
+
+        // Se estiver logado e já tiver resultados no user
+        if (user && user.results) {
+            results = user.results;
+        }
+
+        // Se não tiver, calcula pelo localStorage
+        if (!results) {
+            const savedAnswers = JSON.parse(sessionStorage.getItem('answers')) || {};
+            results = {D: 0, I: 0, S: 0, C: 0};
+
+            // Percorre cada pergunta respondida
+            Object.keys(savedAnswers).forEach(qIndex => {
+                const answerIndex = savedAnswers[qIndex];
+                const question = questions[qIndex];
+
+                if (question && question.options[answerIndex]) {
+                    const letra = question.options[answerIndex].value;
+                    if (results.hasOwnProperty(letra)) {
+                        results[letra]++;
+                    }
+                }
+            });
+
+            user = {...(user || {}), results};
+        }
+
+        // Determina o animal
+        const animal = determineAnimal(results);
+
+        document.getElementById('animal-result').innerHTML = `
+    <h2 class="animal-name">Seu perfil: ${animal.name}</h2>
+    <img class="animal-image" src="${animal.image}" alt="${animal.name}">
+    <p class="animal-description">${animal.description}</p>
+    <p><strong>Pontuação:</strong>
+       D: ${results.D} |
+       I: ${results.I} |
+       S: ${results.S} |
+       C: ${results.C}
+    </p>
+`;
+
+// Pega ou cria sessionId
+        let sessionId = localStorage.getItem('sessionId');
+        if (!sessionId) {
+            sessionId = Date.now().toString();
+            localStorage.setItem('sessionId', sessionId);
+        }
+
+// Pega o ID do usuário se estiver logado
+        const usuarioId = localStorage.getItem('usuarioId') || null;
+
+// Envia resultado para o backend
+        fetch('http://localhost:3000/api/resultado', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                usuario_id: usuarioId,
+                pontuacao_d: results.D,
+                pontuacao_i: results.I,
+                pontuacao_s: results.S,
+                pontuacao_c: results.C,
+                perfil: animal.name,
+                sessionId: sessionId
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Resultado salvo:', data);
+            })
+            .catch(err => console.error('Erro ao salvar resultado:', err));
+
+// Mostra os gráficos
+        renderCharts(results);
+    }
+
+    function determineAnimal(results) {
+        const max = Math.max(results.D, results.I, results.S, results.C);
+        const animals = [
+            { name: "Leão", image: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&fit=crop&q=80", description: "Você é dominante e assertivo como um leão..." },
+            { name: "Golfinho", image: "https://images.unsplash.com/photo-1580519542036-c47de6196ba5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&fit=crop&q=80", description: "Você é sociável e comunicativo como um golfinho..." },
+            { name: "Urso", image: "https://images.unsplash.com/photo-1589656966895-2f33e7653819?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&fit=crop&q=80", description: "Você é estável e paciente como um urso..." },
+            { name: "Águia", image: "https://images.unsplash.com/photo-1558144633-44f0d5f5f0e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&fit=crop&q=80", description: "Você é analítico e preciso como uma águia..." }
+        ];
+        if (results.D === max) return animals[0];
+        if (results.I === max) return animals[1];
+        if (results.S === max) return animals[2];
+        return animals[3];
+    }
+
+    function renderCharts(data) {
+        // Gráfico 1 - Pizza
+        new Chart(document.getElementById('chart1'), {
+            type: 'pie',
+            data: {
+                labels: ['Dominância', 'Influência', 'Estabilidade', 'Conformidade'],
+                datasets: [{
+                    data: [data.D, data.I, data.S, data.C],
+                    backgroundColor: [
+                        '#8B4513', // Verde oliva escuro
+                        '#556B2F', // Verde oliva
+                        '#6B8E23', // Verde oliva claro
+                        '#8FBC8F'  // Verde oliva claro
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Distribuição do Perfil',
+                        font: { size: 16 }
+                    },
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Gráfico 2 - Barras
+        new Chart(document.getElementById('chart2'), {
+            type: 'bar',
+            data: {
+                labels: ['D', 'I', 'S', 'C'],
+                datasets: [{
+                    label: 'Pontuação',
+                    data: [data.D, data.I, data.S, data.C],
+                    backgroundColor: [
+                        '#8B4513',
+                        '#556B2F',
+                        '#6B8E23',
+                        '#8FBC8F'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Pontuação por Dimensão',
+                        font: { size: 16 }
+                    }
+                }
+            }
+        });
+
+        // Gráfico 3 - Radar
+        new Chart(document.getElementById('chart3'), {
+            type: 'radar',
+            data: {
+                labels: ['Dominância', 'Influência', 'Estabilidade', 'Conformidade'],
+                datasets: [{
+                    label: 'Seu Perfil',
+                    data: [data.D, data.I, data.S, data.C],
+                    backgroundColor: 'rgba(85, 107, 47, 0.2)',
+                    borderColor: '#556B2F',
+                    pointBackgroundColor: '#556B2F',
+                    pointBorderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Perfil Comportamental',
+                        font: { size: 16 }
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: { display: true },
+                        suggestedMin: 0,
+                        suggestedMax: Math.max(10, data.D, data.I, data.S, data.C) + 2
+                    }
+                }
+            }
+        });
+
+        // Gráfico 4 - Linha (evolução hipotética)
+        new Chart(document.getElementById('chart4'), {
+            type: 'line',
+            data: {
+                labels: ['Teste 1', 'Teste 2', 'Teste 3', 'Teste Atual'],
+                datasets: [
+                    {
+                        label: 'Dominância',
+                        data: [randomScore(), randomScore(), randomScore(), data.D],
+                        borderColor: '#8B4513',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Influência',
+                        data: [randomScore(), randomScore(), randomScore(), data.I],
+                        borderColor: '#556B2F',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Estabilidade',
+                        data: [randomScore(), randomScore(), randomScore(), data.S],
+                        borderColor: '#6B8E23',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Conformidade',
+                        data: [randomScore(), randomScore(), randomScore(), data.C],
+                        borderColor: '#8FBC8F',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Evolução do Perfil',
+                        font: { size: 16 }
+                    }
+                },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Gráfico 5 - Acessos ao site (barras)
+        new Chart(document.getElementById('chart5'), {
+            type: 'bar',
+            data: {
+                labels: siteData.accesses.labels,
+                datasets: [{
+                    label: 'Acessos Mensais',
+                    data: siteData.accesses.data,
+                    backgroundColor: '#556B2F'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Acessos ao Site (2023)',
+                        font: { size: 16 }
+                    }
+                },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Gráfico 6 - Regiões (rosquinha)
+        new Chart(document.getElementById('chart6'), {
+            type: 'doughnut',
+            data: {
+                labels: siteData.regions.labels,
+                datasets: [{
+                    data: siteData.regions.data,
+                    backgroundColor: [
+                        '#8B4513',
+                        '#556B2F',
+                        '#6B8E23',
+                        '#8FBC8F',
+                        '#A9BA9D'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Acessos por Região',
+                        font: { size: 16 }
+                    },
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    }
+
+    function randomScore() {
+        return Math.floor(Math.random() * 10) + 5;
+    }
+
+    // Ajuste responsivo dos gráficos
+    function adjustChartsForMobile() {
+        if (window.innerWidth < 768) {
+            Chart.defaults.font.size = 12;
+            Chart.defaults.aspectRatio = 1;
+        } else {
+            Chart.defaults.font.size = 14;
+            Chart.defaults.aspectRatio = 2;
+        }
+    }
+    window.addEventListener('load', adjustChartsForMobile);
+    window.addEventListener('resize', adjustChartsForMobile);
+    // Inicialização
+    showPage('home');
+</script>
+</body>
+</html>
