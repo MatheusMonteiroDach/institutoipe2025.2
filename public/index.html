@@ -867,7 +867,7 @@
 
         // Se quiser ainda tentar enviar ao backend (opcional)
         try {
-            await fetch('http://localhost:3000/api/respostas', {
+            await fetch('/api/respostas', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({respostas, sessionId})
@@ -887,7 +887,7 @@
             return;
         }
         try {
-            const res = await fetch('http://localhost:3000/api/auth/login', {
+            const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({email, senha: password})
@@ -922,7 +922,7 @@
                     })
                 })
 
-                await fetch('http://localhost:3000/api/vincular', {
+                await fetch('/api/vincular', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
