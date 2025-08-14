@@ -25,8 +25,8 @@ app.use('/api/resultado', resultadoRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/vincular', vincularRoute);
 
-// Se nenhuma rota da API for chamada, envia o index.html
-app.get('/', (req, res) => {
+// Qualquer rota não encontrada nas APIs envia o index.html
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
