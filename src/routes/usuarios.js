@@ -6,14 +6,16 @@ const db = require('../config/db');
 router.post('/', (req, res) => {
     const { nome, email, regiao, profissao } = req.body;
 
-    if (!nome || !email || !profissao) {
-        return res.status(400).json({ error: 'Nome , email e profissao são obrigatórios' });
+    if (!nome || !email) {
+        return res.status(400).json({ error: 'Nome e email são obrigatórios' });
     }
+
+    const profissaoFinal = profissao && profissao.trim() !== '' ? profissao : 'Não informado';
 
     // query para inserir usuário no banco
     const query = 'INSERT INTO usuarios (nome, email, regiao, profissao) VALUES (?, ?, ?, ? )';
 
-    db.query(query, [nome, email, regiao || null, profissao], (err, result) => {
+    db.query(query, [nome, email, regiao || null, profissaoFinal], (err, result) => {
         if (err) {
             console.error(err);
             // Verifica erro de email duplicado
