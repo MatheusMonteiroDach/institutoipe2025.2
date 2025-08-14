@@ -4,16 +4,17 @@ const db = require('../config/db');
 
 // Vincular sessionId a um usuário existente
 router.post('/', (req, res) => {
-    const { sessionId, usuarioId } = req.body;
+    const { sessionId, usuarioId, usuario_id } = req.body;
+    const finalUsuarioId = usuarioId || usuario_id;
 
-    if (!sessionId || !usuarioId) {
+    if (!sessionId || !finalUsuarioId) {
         return res.status(400).json({ error: 'sessionId e usuarioId são obrigatórios' });
     }
 
     const atualizarRespostas = new Promise((resolve, reject) => {
         db.query(
             'UPDATE respostas_disc SET usuario_id = ? WHERE session_id = ? AND usuario_id IS NULL',
-            [usuarioId, sessionId],
+            [finalUsuarioId, sessionId],
             (err, result) => {
                 if (err) return reject(err);
                 resolve(result);
@@ -24,7 +25,7 @@ router.post('/', (req, res) => {
     const atualizarResultados = new Promise((resolve, reject) => {
         db.query(
             'UPDATE resultado_disc SET usuario_id = ? WHERE session_id = ? AND usuario_id IS NULL',
-            [usuarioId, sessionId],
+            [finalUsuarioId, sessionId],
             (err, result) => {
                 if (err) return reject(err);
                 resolve(result);
