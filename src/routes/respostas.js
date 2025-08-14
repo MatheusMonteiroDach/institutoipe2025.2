@@ -1,19 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const verificarToken = require('../middlewares/authMiddleware');
 
-// salvar respostas DISC
+// salvar respostas DISC (funciona com ou sem login)
 router.post('/', (req, res) => {
-    const { respostas, sessionId } = req.body;
-    const usuario_id = req.usuario?.id || null;// Envio anônimo por enquanto
+    const { respostas, sessionId, usuario_id: usuarioIdSnake, usuarioId: usuarioIdCamel } = req.body;
+    const usuario_id = usuarioIdSnake || usuarioIdCamel || null;
 
     if (!Array.isArray(respostas) || !sessionId) {
         return res.status(400).json({ error: 'Respostas e sessionId são obrigatórios.' });
     }
 
     // Validação das perguntas
-    const perguntasValidas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const perguntasValidas = Array.from({ length: 30 }, (_, i) => i + 1);
     const numerosEnviados = respostas.map(r => r.pergunta_numero);
     const todasValidas = numerosEnviados.every(num => perguntasValidas.includes(num));
     if (!todasValidas) {
@@ -38,11 +37,13 @@ router.post('/', (req, res) => {
     });
 
     // Inserir respostas no banco
-    const query = `INSERT INTO respostas_disc 
-      (usuario_id, pergunta_numero, resposta, letra_original, session_id)
-      VALUES ?`;
+    const query = `
+        INSERT INTO respostas_disc
+            (usuario_id, pergunta_numero, resposta, letra_original, session_id)
+        VALUES ?
+    `;
 
-    db.query(query, [values], (err, result) => {
+    db.query(query, [values], (err) => {
         if (err) {
             console.error('Erro ao salvar respostas:', err);
             return res.status(500).json({ error: 'Erro ao salvar respostas no banco' });
@@ -63,7 +64,7 @@ router.post('/', (req, res) => {
         `;
 
         db.query(queryResultado, [
-            usuario_id,           // null no início
+            usuario_id,
             contagem.D,
             contagem.I,
             contagem.S,
