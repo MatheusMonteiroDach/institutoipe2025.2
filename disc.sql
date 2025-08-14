@@ -45,3 +45,4 @@ ALTER TABLE resultado_disc ADD COLUMN session_id VARCHAR(255);
 
 ALTER TABLE respostas_disc MODIFY usuario_id INT NULL;
 ALTER TABLE resultado_disc MODIFY usuario_id INT NULL;
+ALTER TABLE usuarios MODIFY profissao VARCHAR(100) DEFAULT 'Não informado';
