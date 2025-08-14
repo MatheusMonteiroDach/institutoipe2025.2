@@ -26,7 +26,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/vincular', vincularRoute);
 
 // Captura qualquer rota não-API e retorna o index.html
-app.get('*', (req, res) => {
+app.get('/:catchAll(*)', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
