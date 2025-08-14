@@ -15,7 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Servir arquivos estáticos da pasta public (subindo um nível)
+// Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ROTAS prefixadas com /api
@@ -25,8 +25,8 @@ app.use('/api/resultado', resultadoRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/vincular', vincularRoute);
 
-// Se não for rota da API, envia o index.html
-app.get('/*', (req, res) => {
+// Rota para servir o index.html para qualquer rota não-API
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
