@@ -4,59 +4,29 @@ const path = require('path');
 require('dotenv').config();
 const db = require('./config/db');
 
+const usuariosRoutes = require('./routes/usuarios');
+const respostasRoutes = require('./routes/respostas');
+const resultadoRoutes = require('./routes/resultado');
+const authRoutes = require('./routes/auth');
+const vincularRoute = require('./routes/vincular');
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Servir arquivos estáticos
+// Servir arquivos estáticos da pasta public (subindo um nível)
 app.use(express.static(path.join(__dirname, '../public')));
 
-// -------- ROTAS API (debug) --------
+// ROTAS prefixadas com /api
+app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/respostas', respostasRoutes);
+app.use('/api/resultado', resultadoRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/vincular', vincularRoute);
 
-// Tente descomentar uma de cada vez e subir no Railway até achar a culpada
-try {
-    // const usuariosRoutes = require('./routes/usuarios');
-    // app.use('/api/usuarios', usuariosRoutes);
-    console.log("✔ Rota usuarios carregada com sucesso");
-} catch (err) {
-    console.error("❌ Erro na rota usuarios:", err);
-}
-
-try {
-    // const respostasRoutes = require('./routes/respostas');
-    // app.use('/api/respostas', respostasRoutes);
-    console.log("✔ Rota respostas carregada com sucesso");
-} catch (err) {
-    console.error("❌ Erro na rota respostas:", err);
-}
-
-try {
-    // const resultadoRoutes = require('./routes/resultado');
-    // app.use('/api/resultado', resultadoRoutes);
-    console.log("✔ Rota resultado carregada com sucesso");
-} catch (err) {
-    console.error("❌ Erro na rota resultado:", err);
-}
-
-try {
-    // const authRoutes = require('./routes/auth');
-    // app.use('/api/auth', authRoutes);
-    console.log("✔ Rota auth carregada com sucesso");
-} catch (err) {
-    console.error("❌ Erro na rota auth:", err);
-}
-
-try {
-    // const vincularRoute = require('./routes/vincular');
-    // app.use('/api/vincular', vincularRoute);
-    console.log("✔ Rota vincular carregada com sucesso");
-} catch (err) {
-    console.error("❌ Erro na rota vincular:", err);
-}
-
-// Rota de fallback para SPA
-app.get('/*', (req, res) => {
+// Captura qualquer rota não-API e retorna o index.html
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
