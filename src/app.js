@@ -26,7 +26,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/vincular', vincularRoute);
 
 // Se não for rota da API, envia o index.html
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
