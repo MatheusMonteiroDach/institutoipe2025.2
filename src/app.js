@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 const db = require('./config/db');
 
@@ -9,11 +10,13 @@ const resultadoRoutes = require('./routes/resultado');
 const authRoutes = require('./routes/auth');
 const vincularRoute = require('./routes/vincular');
 
-
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Servir arquivos estáticos da pasta public
+app.use(express.static(path.join(__dirname, '../public')));
 
 // ROTAS prefixadas com /api
 app.use('/api/usuarios', usuariosRoutes);
@@ -22,14 +25,12 @@ app.use('/api/resultado', resultadoRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/vincular', vincularRoute);
 
-
-// Rota de teste
+// Se nenhuma rota da API for chamada, envia o index.html
 app.get('/', (req, res) => {
-    res.send('API DISC funcionando!');
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
