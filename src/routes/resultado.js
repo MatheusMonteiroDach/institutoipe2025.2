@@ -28,4 +28,27 @@ router.get('/:usuario_id', (req, res) => {
     });
 });
 
+// rota para salvar o resultado DISC
+router.post('/', (req, res) => {
+    const { usuario_id, pontuacao_d, pontuacao_i, pontuacao_s, pontuacao_c, perfil, sessionId } = req.body;
+
+    if (!sessionId) {
+        return res.status(400).json({ error: 'sessionId é obrigatório' });
+    }
+
+    const query = `
+        INSERT INTO resultado_disc 
+        (usuario_id, pontuacao_d, pontuacao_i, pontuacao_s, pontuacao_c, perfil, session_id) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(query, [usuario_id || null, pontuacao_d, pontuacao_i, pontuacao_s, pontuacao_c, perfil, sessionId], (err, result) => {
+        if (err) {
+            console.error('Erro ao salvar resultado DISC:', err);
+            return res.status(500).json({ error: 'Erro ao salvar resultado' });
+        }
+        res.status(201).json({ message: 'Resultado salvo com sucesso!' });
+    });
+});
+
 module.exports = router;
