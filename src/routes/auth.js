@@ -6,23 +6,28 @@ const db = require('../config/db');
 const router = express.Router();
 const JWT_SECRET = 'seu_token_super_secreto';
 
-// cadastro de usuário
+// Cadastro de usuário
 router.post('/register', async (req, res) => {
     const { nome, email, regiao, profissao, senha } = req.body;
 
-    if (!nome || !email || !regiao || !profissao || !senha) {
-        return res.status(400).json({ error: 'Preencha todos os campos obrigatórios' });
+    // Agora só nome, email e senha são obrigatórios
+    if (!nome || !email || !senha) {
+        return res.status(400).json({ error: 'Preencha nome, email e senha' });
     }
+
+    // Valores padrão se não forem enviados
+    const regiaoFinal = regiao && regiao.trim() !== '' ? regiao : null;
+    const profissaoFinal = profissao && profissao.trim() !== '' ? profissao : 'Não informado';
 
     try {
         const senhaHash = await bcrypt.hash(senha, 10);
 
         const query = `
-      INSERT INTO usuarios (nome, email, regiao, profissao, senha_hash)
-      VALUES (?, ?, ?, ?, ?)
-    `;
+            INSERT INTO usuarios (nome, email, regiao, profissao, senha_hash)
+            VALUES (?, ?, ?, ?, ?)
+        `;
 
-        db.query(query, [nome, email, regiao || null, profissao, senhaHash], (err, result) => {
+        db.query(query, [nome, email, regiaoFinal, profissaoFinal, senhaHash], (err, result) => {
             if (err) {
                 if (err.code === 'ER_DUP_ENTRY') {
                     return res.status(409).json({ error: 'Email já está em uso' });
